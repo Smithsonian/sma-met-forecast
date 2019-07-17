@@ -1,0 +1,98 @@
+This directory contains scripts, run-time data, and a binary
+dependency to produce the SMA radio observing forecast from NOAA
+GFS forecast data.
+
+Directories
+===========
+
+sma-met-forecast/bin
+---------------------
+Contains a copy of the 'am' radiative transfer program compiled
+for the local system.  Documentation and installation
+instructions for the latest version can be found on Zenodo at
+
+  https://doi.org/10.5281/zenodo.640645
+
+and latest version of the source code is at
+
+  https://doi.org/10.5281/zenodo.1193770
+
+sma-met-forecast/run
+--------------------
+Contains temporary run-time data files, and ephemeris data
+associated with the skyfield library used by the script
+plot_forecast.py in the src directory.
+
+sma-met-forecast/src
+--------------------
+Contains the master script sma-met-forecast_job.sh, scripts it
+calls upon, static data, and a script for generating the
+miniconda environment under which these scripts run.
+
+
+Installation and use
+====================
+
+Prerequisites
+-------------
+1. A user has been created or is available to run the forecast as
+a cron job, and this directory has been placed in that user's
+home directory at ~/sma-met-forecast/
+
+2. Miniconda has been installed to /usr/local/miniconda
+
+3. A miniconda environment sma-met-forecast has been created
+using the command:
+
+  $ conda create --name sma-met-forecast --channel conda-forge \
+  python=3.6 pygrib requests python-dateutil matplotlib numpy \
+  pycairo skyfield jplephem sgp4
+
+For convenience, this command is also in
+
+  ~/sma-met-forecast/src/make_conda_env.sh
+
+4. The 'am' radiative transfer program has been compiled and
+placed in ~/sma-met-forecast/bin as noted above.  If 'am' is
+already installed elsewhere on the system, an alternative to
+placing a copy of the binary file there is to edit the line
+
+  export AM=~/sma-met-forecast/bin/am
+
+in sma-met-forecast_job.sh to point to the installed copy of 'am'.
+
+Use
+---
+1. Edit the shell variable assignments in sma-met-forecast_job.sh
+as needed to establish the observatory name, site location, and
+to set DATADIR to the directory which will receive the forecast
+tables and plots.
+
+2. Set up a cron job under the user account mentioned above to
+run the master script once every 6 hours.  Optimally, this should
+be done soon after each new GFS forecast becomes available.  The
+forecasts are run for analysis times of 0:00, 6:00, 12:00, 18:00
+UT.  As of July 2019, a given forecast becomes available around
+5.1 hours after the analysis time, so in sma-met-forecast_job.sh,
+the variable GFS_PRODUCTION_LAG is set to 5.2 hours.  The cron
+job should be triggered soon after.  For example, for Hawaii,
+which is 10 hours behind UT, a suitable user crontab entry is
+
+15 1,7,13,19 * * * timeout 21600 /home/spaine/sma-met-forecast/src/sma-met-forecast_job.sh
+
+to run the job at 1:15, 7:15, 13:15, 19:15 HST, corresponding to
+running at 11:15, 17:15, 23:15, 5:15 UT, to retrieve the GFS
+forecasts for 6:00, 12:00, 18:00, 0:00, respectively.  Note that
+the forecast job is run using the timeout command, with the
+timeout set to 21600 s (6 hours).  This prevents multiple jobs
+interfering with one another if for some reason a job becomes
+stalled.  (Normally, the job takes about 40 minutes to complete,
+limited by the typical NOAA server download queue length.)  If a
+job fails by timing out or for some other reason such as a server
+or network outage, the script will attempt to reconstruct any
+incomplete or missing forecasts from the prior 48 hours.
+
+3. With the cron job installed, a new forecast table, and updated
+120-hour and 384-hour forecast plots will appear every 6 hours in
+DATADIR.  The accumulating forecast tables will need to be archived
+regularly, such as once a year, perhaps by another cron job.
