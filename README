@@ -14,7 +14,7 @@ instructions for the latest version can be found on Zenodo at
 
   https://doi.org/10.5281/zenodo.640645
 
-and latest version of the source code is at
+and the latest version of the source code is at
 
   https://doi.org/10.5281/zenodo.1193770
 
@@ -26,8 +26,8 @@ plot_forecast.py in the src directory.
 
 sma-met-forecast/src
 --------------------
-Contains the master script sma-met-forecast_job.sh, scripts it
-calls upon, static data, and a script for generating the
+Contains the master script sma-met-forecast_job.sh, other scripts
+that it calls upon, static data, and a script for generating the
 miniconda environment under which these scripts run.
 
 
