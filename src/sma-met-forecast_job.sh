@@ -3,7 +3,7 @@
 # used to create the environment sma-met-forecast is in the file
 # make_conda_env.sh
 #
-source /usr/local/miniconda/etc/profile.d/conda.sh
+source /opt/conda/etc/profile.d/conda.sh
 conda activate sma-met-forecast
 
 #
@@ -17,21 +17,21 @@ export ALT=4080
 #
 # Location and version of am binary, and am environment variables
 #
-export AM=~/sma-met-forecast/bin/am
+export AM=/application/src/sma-met-forecast/bin/am
 export AM_VERSION=$($AM -v | awk '/am version/ {print $3}')
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=2
 export AM_CACHE_PATH=
 
 #
 # Directory where these scripts are located
 #
-export APPDIR=~/sma-met-forecast/src
+export APPDIR=/application/src/sma-met-forecast/src
 
 #
 # Working directory, containing temporary data files and
 # ephemeris data used by the plotting script.
 #
-RUNDIR=~/sma-met-forecast/run
+RUNDIR=/application/src/sma-met-forecast/run
 
 #
 # Destination directory for forecast data tables and forecast
@@ -98,7 +98,8 @@ for HOURS_AGO in 00 06 12 18 24 30 36 42 48; do
     if [ $TABLE_LINES -lt $EXPECTED_TABLE_LINES ]; then
         make_forecast_table.sh > $OUTFILE
     fi
-    chmod 755 $OUTFILE
+    chown nobody:nobody $OUTFILE
+    chmod 444 $OUTFILE
     #
     # Make the soft link that is used by the plotting script to
     # access recent forecasts.  If $OUTFILE somehow hasn't been
@@ -109,8 +110,9 @@ for HOURS_AGO in 00 06 12 18 24 30 36 42 48; do
     else
         LINK=$DATADIR/latest-$HOURS_AGO
     fi
-    if [ -e $OUTFILE ]; then
+    if [ -f $OUTFILE ]; then
         ln -f -s $OUTFILE $LINK
+	chown -h nobody:nobody $LINK
     fi
 done
 
@@ -120,7 +122,8 @@ done
 #
 plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $DATADIR 120
 plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $DATADIR 384
-chmod 755 forecast*.png
+chown nobody:nobody forecast*.png
+chmod 444 forecast*.png
 mv forecast*.png $DATADIR
 
 conda deactivate
