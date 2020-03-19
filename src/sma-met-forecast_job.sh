@@ -3,7 +3,17 @@
 # used to create the environment sma-met-forecast is in the file
 # make_conda_env.sh
 #
-source /opt/conda/etc/profile.d/conda.sh
+
+#
+# Choose exactly one of the following to set up the conda environment
+# in the shell running this job.
+#
+# SMA production installation of conda in /opt/conda on RedHat:
+# source /opt/conda/etc/profile.d/conda.sh
+#
+# miniconda installed in /usr/local/miniconda on macOS:
+source /usr/local/miniconda/etc/profile.d/conda.sh
+
 conda activate sma-met-forecast
 
 #
@@ -37,7 +47,8 @@ RUNDIR=/application/src/sma-met-forecast/run
 # Destination directory for forecast data tables and forecast
 # plots.
 #
-DATADIR=/sma/web/sma-met-forecast
+DATADIR=/data/met/sma-met-forecast
+PLOTDIR=/sma/web/sma-met-forecast
 
 #
 # The script latest_gfs_cycle_time.py prints a time string
@@ -84,7 +95,15 @@ GFS_LATEST=$(latest_gfs_cycle_time.py)
 EXPECTED_TABLE_LINES=210
 for HOURS_AGO in 00 06 12 18 24 30 36 42 48; do
     export GFS_CYCLE=$(relative_gfs_cycle_time.py $GFS_LATEST -$HOURS_AGO)
-    OUTFILE=$DATADIR/$(make_gfs_timestamp.py $GFS_CYCLE 0)
+    BASENAME=$(make_gfs_timestamp.py $GFS_CYCLE 0)
+    YEAR=${BASENAME:0:4}
+    OUTFILE=$DATADIR/$YEAR/$BASENAME
+    #
+    # If the subdirectory for YEAR doesn't exist, make it
+    #
+    if [ ! -d $DATADIR/$YEAR ]; then
+        mkdir $DATADIR/$YEAR
+    fi
     #
     # If the file doesn't exist, make it
     #
@@ -124,6 +143,6 @@ plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $DATADIR 120
 plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $DATADIR 384
 chown nobody:nobody forecast*.png
 chmod 444 forecast*.png
-mv forecast*.png $DATADIR
+mv forecast*.png $PLOTDIR
 
 conda deactivate
