@@ -1,20 +1,13 @@
 #
-# Activate the conda environment for this script.  The command
-# used to create the environment sma-met-forecast is in the file
-# make_conda_env.sh
+# The shell environment in which the forecast scripts run needs
+# to be set up for conda.  CONDA_INIT_SCRIPT_PATH is the location
+# of the initialization script for conda on the host machine.
 #
-
-#
-# Choose exactly one of the following to set up the conda environment
-# in the shell running this job.
-#
-# SMA production installation of conda in /opt/conda on RedHat:
-# source /opt/conda/etc/profile.d/conda.sh
+# SMA production installation in opt/conda/ on Redhat:
+# CONDA_INIT_SCRIPT_PATH=/opt/conda/etc/profile.d/conda.sh
 #
 # miniconda installed in /usr/local/miniconda on macOS:
-source /usr/local/miniconda/etc/profile.d/conda.sh
-
-conda activate sma-met-forecast
+CONDA_INIT_SCRIPT_PATH=/usr/local/miniconda/etc/profile.d/conda.sh
 
 #
 # Site parameters
@@ -44,11 +37,14 @@ export APPDIR=/application/src/sma-met-forecast/src
 RUNDIR=/application/src/sma-met-forecast/run
 
 #
-# Destination directory for forecast data tables and forecast
-# plots.
+# Destination directory for the site forecast data tables.
 #
-DATADIR=/data/met/sma-met-forecast
-PLOTDIR=/sma/web/sma-met-forecast
+SITE_FCAST_DIR=/data/met/sma-met-forecast
+
+#
+# Destination directory for the site forecast plots.
+#
+SITE_FCAST_PLOT_DIR=/sma/web/sma-met-forecast
 
 #
 # The script latest_gfs_cycle_time.py prints a time string
@@ -71,6 +67,15 @@ PLOTDIR=/sma/web/sma-met-forecast
 #
 export GFS_PRODUCTION_LAG=5.2
 
+#
+# Initialize conda and activate the environment for this script.
+# (As noted in the README file, the conda environment
+# sma-met-forecast can be created using the script
+# make_conda_env.sh in the src/ directory.
+#
+source $CONDA_INIT_SCRIPT_PATH
+conda activate sma-met-forecast
+
 export PATH="$APPDIR:$PATH"
 cd $RUNDIR
 
@@ -85,24 +90,25 @@ cd $RUNDIR
 GFS_LATEST=$(latest_gfs_cycle_time.py)
 
 #
-# Make the data table for the most recent forecast in the
-# forecast data directory.  These tables will accumulate there,
-# and will need to be archived from time to time.  Also do any of
-# the prior 48 hours' forecasts that are missing or short of full
-# size.  This is needed the first time this script runs and later
-# to clean up after outages.
+# Make the data table for the most recent site forecast.  Site
+# forecasts are saved in SITE_FCAST_DIR in subdirectories by
+# year.
+#
+# If any of the prior 48 hours' forecasts are missing or short of
+# full size, they will also be rebuilt.  This is needed the first
+# time this script runs and later to clean up after outages.
 #
 EXPECTED_TABLE_LINES=210
 for HOURS_AGO in 00 06 12 18 24 30 36 42 48; do
     export GFS_CYCLE=$(relative_gfs_cycle_time.py $GFS_LATEST -$HOURS_AGO)
     BASENAME=$(make_gfs_timestamp.py $GFS_CYCLE 0)
     YEAR=${BASENAME:0:4}
-    OUTFILE=$DATADIR/$YEAR/$BASENAME
+    OUTFILE=$SITE_FCAST_DIR/$YEAR/$BASENAME
     #
     # If the subdirectory for YEAR doesn't exist, make it
     #
-    if [ ! -d $DATADIR/$YEAR ]; then
-        mkdir $DATADIR/$YEAR
+    if [ ! -d $SITE_FCAST_DIR/$YEAR ]; then
+        mkdir $SITE_FCAST_DIR/$YEAR
     fi
     #
     # If the file doesn't exist, make it
@@ -125,9 +131,9 @@ for HOURS_AGO in 00 06 12 18 24 30 36 42 48; do
     # successfully created, leave the link as is.
     #
     if [ $HOURS_AGO -eq 0 ]; then
-        LINK=$DATADIR/latest
+        LINK=$SITE_FCAST_DIR/latest
     else
-        LINK=$DATADIR/latest-$HOURS_AGO
+        LINK=$SITE_FCAST_DIR/latest-$HOURS_AGO
     fi
     if [ -f $OUTFILE ]; then
         ln -f -s $OUTFILE $LINK
@@ -139,10 +145,10 @@ done
 # Generate the plots and move the plot images to the data
 # directory.
 #
-plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $DATADIR 120
-plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $DATADIR 384
+plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $SITE_FCAST_DIR 120
+plot_forecast.py "$SITE" $LAT $LON $ALT $AM_VERSION $SITE_FCAST_DIR 384
 chown nobody:nobody forecast*.png
 chmod 444 forecast*.png
-mv forecast*.png $PLOTDIR
+mv forecast*.png $SITE_FCAST_PLOT_DIR
 
 conda deactivate
