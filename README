@@ -37,13 +37,12 @@ Installation and use
 Prerequisites
 -------------
 1. A user has been created or is available to run the forecast as
-a cron job, and this directory has been placed in that user's
-home directory at ~/sma-met-forecast/
+a cron job.
 
-2. Miniconda has been installed to /usr/local/miniconda
+2. Conda or miniconda has been installed on the host machine.
 
-3. A miniconda environment sma-met-forecast has been created
-using the command:
+3. A conda environment sma-met-forecast has been created using
+the command:
 
   $ conda create --name sma-met-forecast --channel conda-forge \
   python=3.6 pygrib requests python-dateutil matplotlib numpy \
@@ -66,8 +65,7 @@ Use
 ---
 1. Edit the shell variable assignments in sma-met-forecast_job.sh
 as needed to establish the observatory name, site location, and
-to set DATADIR to the directory which will receive the forecast
-tables and plots.
+directory paths as needed.
 
 2. Set up a cron job under the user account mentioned above to
 run the master script once every 6 hours.  Optimally, this should
@@ -79,7 +77,7 @@ the variable GFS_PRODUCTION_LAG is set to 5.2 hours.  The cron
 job should be triggered soon after.  For example, for Hawaii,
 which is 10 hours behind UT, a suitable user crontab entry is
 
-15 1,7,13,19 * * * timeout 21600 /home/spaine/sma-met-forecast/src/sma-met-forecast_job.sh
+15 1,7,13,19 * * * timeout 21600 /application/src/sma-met-forecast/src/sma-met-forecast_job.sh
 
 to run the job at 1:15, 7:15, 13:15, 19:15 HST, corresponding to
 running at 11:15, 17:15, 23:15, 5:15 UT, to retrieve the GFS
@@ -93,7 +91,8 @@ job fails by timing out or for some other reason such as a server
 or network outage, the script will attempt to reconstruct any
 incomplete or missing forecasts from the prior 48 hours.
 
-3. With the cron job installed, a new forecast table, and updated
-120-hour and 384-hour forecast plots will appear every 6 hours in
-DATADIR.  The accumulating forecast tables will need to be archived
-regularly, such as once a year, perhaps by another cron job.
+3. With the cron job installed, a new site forecast table, and
+updated 120-hour and 384-hour forecast plots will appear every 6
+hours in SITE_FCAST_DIR, in subdirectories named by year.
+Forecast plots will appear in SITE_FCAST_PLOT_DIR, overwriting
+the previous plot.
