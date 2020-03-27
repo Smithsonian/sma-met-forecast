@@ -4,10 +4,10 @@
 # of the initialization script for conda on the host machine.
 #
 # SMA production installation in opt/conda/ on Redhat:
-CONDA_INIT_SCRIPT_PATH=/opt/conda/etc/profile.d/conda.sh
+# CONDA_INIT_SCRIPT_PATH=/opt/conda/etc/profile.d/conda.sh
 #
 # miniconda installed in /usr/local/miniconda on macOS:
-# CONDA_INIT_SCRIPT_PATH=/usr/local/miniconda/etc/profile.d/conda.sh
+CONDA_INIT_SCRIPT_PATH=/usr/local/miniconda/etc/profile.d/conda.sh
 
 #
 # Site parameters.

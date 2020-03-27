@@ -391,21 +391,32 @@ axes_arr[1].set_ylim(bottom=-0.05 * pwv_max, top=None)
 fig.align_ylabels()
 plt.subplots_adjust(top=0.98, bottom=0.17, left=0.12, right=0.97)
 
-footnote = """
-Forecast is for {0} at {1} deg. {2}, {3} deg. {4}, {5} m altitude.  The current forecast is plotted in black and the prior 48 hours' forecasts in grey.  Shading indicates local night, and weekdays in the top panel are indicated in local ({6}) time.
-
-All quantities are referred to zenith.  Definitions are: {7} - 225 GHz optical depth; PWV - precipitable water vapor; LWP - cloud liquid water path; IWP - cloud ice water path; {8} - ozone column density in Dobson Units.
-
-Atmospheric state data are from the NOAA/NCEP Global Forecast System (GFS), with data access provided by the NOAA Operational Model Archive and Distribution System (https://nomads.ncep.noaa.gov).  Optical depth is from am v.{9} (https://doi.org/10.5281/zenodo.640645).
-""".format(
-        args.site,
-        abs(args.lat), "S" if args.lat < 0 else "N",
-        abs(args.lon), "W" if args.lon < 0 else "E",
-        args.alt,
-        args.tz,
-        r'$\mathrm{\tau_{225}}$',
-        r'$\mathrm{O_3\ [DU]}$',
-        args.am_vers)
+footnote = (
+        "Forecast is for " +
+        "{0} at {1} deg. {2}, {3} deg. {4}, {5} m altitude.  ".format(
+                args.site,
+                abs(args.lat), "S" if args.lat < 0 else "N",
+                abs(args.lon), "W" if args.lon < 0 else "E",
+                args.alt) +
+        "The current forecast is plotted in black and the prior 48 " +
+        "hours' forecasts in grey.  Shading indicates local night, " +
+        "and weekdays in the top panel are indicated in local " +
+        "({0}) time.\n".format(args.tz) +
+        "\n" +
+        "All quantities are referred to zenith.  Definitions are: " +
+        r"$\mathrm{\tau_{225}}$" +
+        " - 225 GHz optical depth; PWV - precipitable water vapor; " +
+        "LWP - cloud liquid water path; IWP - cloud ice water path; " +
+        r"$\mathrm{O_3\ [DU]}$" +
+        " - ozone column density in Dobson Units.\n" +
+        "\n" +
+        "Atmospheric state data are from the NOAA/NCEP Global " +
+        "Forecast System (GFS), with data access provided by the " +
+        "NOAA Operational Model Archive and Distribution System " +
+        "(https://nomads.ncep.noaa.gov).  Optical depth is from " +
+        "am v.{0}".format(args.am_vers) + 
+        "(https://doi.org/10.5281/zenodo.640645).\n"
+        )
 
 plt.figtext(0.07, 0.0, footnote, fontsize=5.5, wrap=True)
 fig.savefig('forecast_{0}.png'.format(args.hours), dpi=150)
