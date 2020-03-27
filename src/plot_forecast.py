@@ -343,8 +343,7 @@ axes_top.annotate(
         args.tz,
         xy=(5,12),
         xycoords='axes points',
-        fontsize=8,
-        style='italic')
+        fontsize=8)
 axes_top.xaxis.set_tick_params(which='both', direction='in',
         top=False, bottom=True, labeltop=False, labelbottom=True)
 if (args.hours <= 120):
@@ -392,12 +391,12 @@ axes_arr[1].set_ylim(bottom=-0.05 * pwv_max, top=None)
 fig.align_ylabels()
 plt.subplots_adjust(top=0.98, bottom=0.17, left=0.12, right=0.97)
 
-annotation_str = """
+footnote = """
 Forecast is for {0} at {1} deg. {2}, {3} deg. {4}, {5} m altitude.  The current forecast is plotted in black and the prior 48 hours' forecasts in grey.  Shading indicates local night, and weekdays in the top panel are indicated in local ({6}) time.
 
-All quantities are referred to zenith.  Definitions are: {7} - 225 GHz optical depth; PWV - precipitable water vapor; LWP / IWP - cloud liquid / ice water path; $O_3$ - ozone column density in Dobson Units.
+All quantities are referred to zenith.  Definitions are: {7} - 225 GHz optical depth; PWV - precipitable water vapor; LWP - cloud liquid water path; IWP - cloud ice water path; {8} - ozone column density in Dobson Units.
 
-Atmospheric state data are from the NOAA/NCEP Global Forecast System (GFS), with data access provided by the NOAA Operational Model Archive and Distribution System (https://nomads.ncep.noaa.gov).  Optical depth is from am v.{8} (https://doi.org/10.5281/zenodo.640645).
+Atmospheric state data are from the NOAA/NCEP Global Forecast System (GFS), with data access provided by the NOAA Operational Model Archive and Distribution System (https://nomads.ncep.noaa.gov).  Optical depth is from am v.{9} (https://doi.org/10.5281/zenodo.640645).
 """.format(
         args.site,
         abs(args.lat), "S" if args.lat < 0 else "N",
@@ -405,8 +404,9 @@ Atmospheric state data are from the NOAA/NCEP Global Forecast System (GFS), with
         args.alt,
         args.tz,
         r'$\mathrm{\tau_{225}}$',
+        r'$\mathrm{O_3\ [DU]}$',
         args.am_vers)
 
-plt.figtext(0.07, 0.0, annotation_str, fontsize=6, wrap=True)
+plt.figtext(0.07, 0.0, footnote, fontsize=5.5, wrap=True)
 fig.savefig('forecast_{0}.png'.format(args.hours), dpi=150)
 plt.close(fig)
