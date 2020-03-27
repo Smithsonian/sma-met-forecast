@@ -132,7 +132,6 @@ axes_arr[0].grid(
         axis="y",
         dashes=(1.0, 1.0),
         color="0.9")
-axes_arr[0].set_ylim(bottom=0.01)
 axes_arr[0].set_yscale('log')
 axes_arr[0].annotate(
         r'$\mathrm{\tau_{225}}$',
@@ -381,7 +380,7 @@ else:
 tau_max = axes_arr[0].get_ylim()[1]
 if (tau_max < 0.1):
     tau_max = 0.1
-axes_arr[0].set_ylim(top=tau_max)
+axes_arr[0].set_ylim(bottom=0.01, top=tau_max)
 #
 # Tweak to PWV y axis to always start from pwv = 0, with a
 # small offset.
