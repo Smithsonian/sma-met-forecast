@@ -64,8 +64,8 @@ in sma-met-forecast_job.sh to point to the installed copy of 'am'.
 Use
 ---
 1. Edit the shell variable assignments in sma-met-forecast_job.sh
-as needed to establish the observatory name, site location, and
-directory paths as needed.
+as needed to establish the observatory name, site location, site
+time zone, and directory paths as needed.
 
 2. Set up a cron job under the user account mentioned above to
 run the master script once every 6 hours.  Optimally, this should
