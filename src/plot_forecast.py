@@ -17,7 +17,7 @@ import matplotlib
 matplotlib.use('Cairo')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from matplotlib.dates import MO, TU, WE, TH, FR, SA, SU
+from matplotlib.dates import DAILY, MO, TU, WE, TH, FR, SA, SU
 import numpy as np
 import skyfield.api as sf
 ts = sf.load.timescale()
@@ -335,42 +335,29 @@ axes_arr[-1].annotate(
         fontsize=10)
 #
 # Create a twin of the top axes to carry weekday labels in
-# local observatory time.
+# local observatory time.  Major ticks are placed at the day
+# boundaries.  Labels for selected days are placed on invisible
+# minor ticks located at 12:00 noon local time.
 #
 axes_top = axes_arr[0].twiny()
 axes_top.set_xlim(xmin, xmax)
-axes_top.annotate(
-        args.tz,
-        xy=(5,12),
-        xycoords='axes points',
-        fontsize=8)
+axes_top.annotate(args.tz, xy=(5,12), xycoords='axes points', fontsize=8)
 axes_top.xaxis.set_tick_params(which='both', direction='in',
         top=False, bottom=True, labeltop=False, labelbottom=True)
+
+axes_top.xaxis.set_major_locator(mdates.DayLocator(tz=tz_site))
+axes_top.xaxis.set_major_formatter(matplotlib.ticker.NullFormatter()) 
+axes_top.xaxis.set_tick_params(which='major', length=8)
+
 if (args.hours <= 120):
-    axes_top.xaxis.set_major_locator(
-            mdates.HourLocator(byhour=0,  tz=tz_site))
-    axes_top.xaxis.set_minor_locator(
-            mdates.HourLocator(byhour=12, tz=tz_site))
-    axes_top.xaxis.set_major_formatter(
-            matplotlib.ticker.NullFormatter()) 
-    axes_top.xaxis.set_minor_formatter(
-            mdates.DateFormatter("%a", tz=tz_site)) 
-    axes_top.xaxis.set_tick_params(
-            which='major', length=8)
-    axes_top.xaxis.set_tick_params(
-            which='minor', length=0, labelsize=8, pad=-8)
+    labeled_days=(MO, TU, WE, TH, FR, SA, SU)
 else:
-    axes_top.xaxis.set_major_locator(
-            mdates.WeekdayLocator(byweekday=(MO), tz=tz_site))
-    axes_top.xaxis.set_minor_locator(
-            mdates.HourLocator(byhour=0, tz=tz_site))
-    axes_top.xaxis.set_major_formatter(
-            mdates.DateFormatter(" %a", tz=tz_site)) 
-    axes_top.xaxis.set_tick_params(
-            which='major', length=8, labelsize=8, pad=-8)
-    axes_top.xaxis.set_tick_params(
-            which='minor', length=4)
-    plt.setp(axes_top.get_xticklabels(), ha='left')
+    labeled_days=(SA, SU)
+rule = mdates.rrulewrapper(DAILY, byweekday=labeled_days, byhour=12)
+loc  = mdates.RRuleLocator(rule, tz=tz_site)
+axes_top.xaxis.set_minor_locator(loc)
+axes_top.xaxis.set_minor_formatter(mdates.DateFormatter("%a", tz=tz_site)) 
+axes_top.xaxis.set_tick_params(which='minor', length=0, labelsize=8, pad=-8)
 
 #
 # Tweak to tau225 y-axis to ensure we always get at least one
