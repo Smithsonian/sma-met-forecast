@@ -401,7 +401,7 @@ footnote = (
         "Forecast System (GFS), with data access provided by the " +
         "NOAA Operational Model Archive and Distribution System " +
         "(https://nomads.ncep.noaa.gov).  Optical depth is from " +
-        "am v.{0}".format(args.am_vers) + 
+        "am v.{0} ".format(args.am_vers) + 
         "(https://doi.org/10.5281/zenodo.640645).\n"
         )
 
