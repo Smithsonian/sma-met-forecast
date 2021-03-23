@@ -71,7 +71,7 @@ time zone, and directory paths as needed.
 run the master script once every 6 hours.  Optimally, this should
 be done soon after each new GFS forecast becomes available.  The
 forecasts are run for analysis times of 0:00, 6:00, 12:00, 18:00
-UT.  As of July 2019, a given forecast becomes available around
+UT.  As of March 2021, a given forecast becomes available around
 5.1 hours after the analysis time, so in sma-met-forecast_job.sh,
 the variable GFS_PRODUCTION_LAG is set to 5.2 hours.  The cron
 job should be triggered soon after.  For example, for Hawaii,

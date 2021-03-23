@@ -35,7 +35,7 @@ printf "#%16s %12s %12s %12s %12s %12s %12s\n" \
 #
 for (( H = 0   ; H <= 120 ; H += 1 )); do
     FORECAST_HOUR=$(printf "f%03d" $H)
-    if gfs15_to_am10.py $LAT $LON $ALT $GFS_CYCLE $FORECAST_HOUR \
+    if gfs16_to_am10.py $LAT $LON $ALT $GFS_CYCLE $FORECAST_HOUR \
             > layers.amc 2>layers.err; then
         make_gfs_timestamp.py $GFS_CYCLE $H
         cat $APPDIR/header.amc layers.amc | $AM - 2>&1 |
@@ -52,7 +52,7 @@ done
 #
 for (( H = 123 ; H <= 384 ; H += 3 )); do
     FORECAST_HOUR=$(printf "f%03d" $H)
-    if gfs15_to_am10.py $LAT $LON $ALT $GFS_CYCLE $FORECAST_HOUR \
+    if gfs16_to_am10.py $LAT $LON $ALT $GFS_CYCLE $FORECAST_HOUR \
             > layers.amc 2>layers.err; then
         make_gfs_timestamp.py $GFS_CYCLE $H
         cat $APPDIR/header.amc layers.amc | $AM - 2>&1 |
