@@ -240,6 +240,7 @@ for fnum, fname in enumerate(filenames):
     #
     # Computation of the x axis range and day/night shading
     # are done once when the first data file is processed.
+    #
     if (fnum == 0):
         for axes in axes_arr:
             axes.grid(
@@ -376,7 +377,16 @@ axes_arr[1].set_ylim(bottom=-0.05 * pwv_max, top=None)
 # Tweaks to adjust plot and label positions
 #
 fig.align_ylabels()
-plt.subplots_adjust(top=0.98, bottom=0.17, left=0.12, right=0.97)
+plt.subplots_adjust(top=0.96, bottom=0.17, left=0.12, right=0.97)
+
+#
+# Write a header with the update time right at the top.  This will
+# make a stale forecast more easily noticed.
+#
+update_time = datetime.datetime.now(tz=tz_site)
+update_str  = update_time.strftime("%A, %B %d, %Y at %I:%M %p")
+header   = "Updated {0} {1}".format(update_str, args.tz)
+plt.figtext(0.05, 0.98, header, fontsize=9)
 
 footnote = (
         "Forecast is for " +
