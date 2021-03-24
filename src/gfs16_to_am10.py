@@ -277,10 +277,7 @@ for i,lev in enumerate(LEVELS):
     try:
         x = (grid_interp(grbindx.select(
             name="Relative humidity", level=lev)[0].values, u, v))
-        if (lev >= RH_TOP_PLEVEL):
-            RH.append(x)
-        else:
-            RH.append(0.0)
+        RH.append(x)
     except:
         RH.append(0.0)
     try:
@@ -336,11 +333,13 @@ for i,lev in enumerate(LEVELS):
         T_mid         = T[i]
     if (o3_vmr_mid > 0.0):
         print("column o3 vmr {0:.3e}".format(o3_vmr_mid))
-    if (RH_mid > 0.0):
-        if (T_mid > H2O_SUPERCOOL_LIMIT):
-            print("column h2o RH {0:.2f}%".format(RH_mid))
-        else:
+    if (Pbase[i] > RH_TOP_PLEVEL):
+        if (T_mid < H2O_SUPERCOOL_LIMIT):
             print("column h2o RHi {0:.2f}%".format(RH_mid))
+        else:
+            print("column h2o RH {0:.2f}%".format(RH_mid))
+    else:
+        print("column h2o vmr {0:.3e}".format(STRAT_H2O_VMR))
     if (cloud_lmr_mid > 0.0):
         #
         # Convert cloud liquid water mixing ratio [kg / kg] to
@@ -383,18 +382,19 @@ if (i == 0):
 if (z[i] == args.altitude):
     exit(0)
 
-u = (args.altitude - z[i-1]) / (z[i] - z[i-1])
+u      = (args.altitude - z[i-1]) / (z[i] - z[i-1])
 logP_s = u * math.log(Pbase[i]) + (1.0 - u) * math.log(Pbase[i-1]) 
-P_s = math.exp(logP_s)
-T_s = u * T[i] + (1.0 - u) * T[i-1]
+P_s    = math.exp(logP_s)
+T_s    = u * T[i] + (1.0 - u) * T[i-1]
+T_mid  = 0.5 * (T_s + T[i-1])
 
 #
 # Other variables are interpolated or extrapolated linearly in P
 # to the base level and clamped at zero.
 #
 u = (P_s - Pbase[i-1]) / (Pbase[i] - Pbase[i-1])
-o3_vmr_s    =   u * o3_vmr[i]  + (1.0 - u) *    o3_vmr[i-1]
-RH_s        =       u * RH[i]  + (1.0 - u) *        RH[i-1]
+o3_vmr_s    = u *    o3_vmr[i] + (1.0 - u) *    o3_vmr[i-1]
+RH_s        = u *        RH[i] + (1.0 - u) *        RH[i-1]
 cloud_lmr_s = u * cloud_lmr[i] + (1.0 - u) * cloud_lmr[i-1]
 cloud_imr_s = u * cloud_imr[i] + (1.0 - u) * cloud_imr[i-1]
 if (o3_vmr_s < 0.0):
@@ -415,16 +415,21 @@ print("Tbase {0:.1f} K".format(T_s))
 print("column dry_air vmr")
 if (o3_vmr_mid > 0.0):
     print("column o3 vmr {0:.3e}".format(o3_vmr_mid))
-if (RH_mid > 0.0):
-    if (T_mid > H2O_SUPERCOOL_LIMIT):
-        print("column h2o RH {0:.2f}%".format(RH_mid))
-    else:
+if (P_s > RH_TOP_PLEVEL):
+    if (T_mid < H2O_SUPERCOOL_LIMIT):
         print("column h2o RHi {0:.2f}%".format(RH_mid))
+    else:
+        print("column h2o RH {0:.2f}%".format(RH_mid))
+else:
+    print("column h2o vmr {0:.3e}".format(STRAT_H2O_VMR))
 if (cloud_lmr_mid > 0.0):
     dP = PASCAL_ON_MBAR * (Pbase[i] - Pbase[i-1])
     m = dP / G_STD 
     ctw = m * cloud_lmr_mid
-    print("column lwp_abs_Rayleigh {0:.3e} kg*m^-2".format(ctw))
+    if (T_mid < H2O_SUPERCOOL_LIMIT):
+        print("column iwp_abs_Rayleigh {0:.3e} kg*m^-2".format(ctw))
+    else:
+        print("column lwp_abs_Rayleigh {0:.3e} kg*m^-2".format(ctw))
 if (cloud_imr_mid > 0.0):
     dP = PASCAL_ON_MBAR * (Pbase[i] - Pbase[i-1])
     m = dP / G_STD 
