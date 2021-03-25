@@ -18,8 +18,8 @@ import sys
 import time
 
 # Timeouts and retries
-CONN_TIMEOUT        = 4        # Initial server response timeout in seconds
-READ_TIMEOUT        = 4        # Stalled download timeout in seconds
+CONN_TIMEOUT        = 8        # Initial server response timeout in seconds
+READ_TIMEOUT        = 8        # Stalled download timeout in seconds
 RETRY_DELAY         = 60       # Delay before retry (NOAA requests 60 s)
 MAX_DOWNLOAD_TRIES  = 4
 
