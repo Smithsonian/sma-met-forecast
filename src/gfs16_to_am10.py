@@ -349,7 +349,7 @@ for i,lev in enumerate(LEVELS):
         # negligible amounts of liquid water at unphysically
         # low temperature.)
         #
-        dP = PASCAL_ON_MBAR * (Pbase[i] - Pbase[i-1])
+        dP = PASCAL_ON_MBAR * (Pbase[0] if i == 0 else Pbase[i] - Pbase[i-1])
         m = dP / G_STD 
         ctw = m * cloud_lmr_mid
         if (T_mid < H2O_SUPERCOOL_LIMIT):
@@ -361,7 +361,7 @@ for i,lev in enumerate(LEVELS):
         # Convert cloud ice mixing ratio [kg / kg] to cloud total
         # ice across the layer [kg / m^2].
         #
-        dP = PASCAL_ON_MBAR * (Pbase[i] - Pbase[i-1])
+        dP = PASCAL_ON_MBAR * (Pbase[0] if i == 0 else Pbase[i] - Pbase[i-1])
         m = dP / G_STD 
         cti = m * cloud_imr_mid
         print("column iwp_abs_Rayleigh {0:.3e} kg*m^-2".format(cti))
@@ -423,7 +423,7 @@ if (P_s > RH_TOP_PLEVEL):
 else:
     print("column h2o vmr {0:.3e}".format(STRAT_H2O_VMR))
 if (cloud_lmr_mid > 0.0):
-    dP = PASCAL_ON_MBAR * (Pbase[i] - Pbase[i-1])
+    dP = PASCAL_ON_MBAR * (Pbase[0] if i == 0 else Pbase[i] - Pbase[i-1])
     m = dP / G_STD 
     ctw = m * cloud_lmr_mid
     if (T_mid < H2O_SUPERCOOL_LIMIT):
@@ -431,7 +431,7 @@ if (cloud_lmr_mid > 0.0):
     else:
         print("column lwp_abs_Rayleigh {0:.3e} kg*m^-2".format(ctw))
 if (cloud_imr_mid > 0.0):
-    dP = PASCAL_ON_MBAR * (Pbase[i] - Pbase[i-1])
+    dP = PASCAL_ON_MBAR * (Pbase[0] if i == 0 else Pbase[i] - Pbase[i-1])
     m = dP / G_STD 
     cti = m * cloud_imr_mid
     print("column iwp_abs_Rayleigh {0:.3e} kg*m^-2".format(cti))
