@@ -244,7 +244,6 @@ for fnum, fname in enumerate(filenames):
     if (fnum == 0):
         for axes in axes_arr:
             axes.grid(
-                    b=True,
                     which="major",
                     dashes=(1.0, 1.0),
                     color="0.8")
