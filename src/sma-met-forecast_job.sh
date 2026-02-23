@@ -30,7 +30,8 @@ TZ="HST"
 #
 # Location and version of am binary, and am environment variables
 #
-export AM=/application/src/sma-met-forecast/bin/am
+#export AM=/application/src/sma-met-forecast/bin/am
+export AM=/instance/sma-met-forecast/bin/am
 export AM_VERSION=$($AM -v | awk '/am version/ {print $3}')
 export OMP_NUM_THREADS=2
 export AM_CACHE_PATH=
@@ -38,13 +39,15 @@ export AM_CACHE_PATH=
 #
 # Directory where these scripts are located
 #
-export APPDIR=/application/src/sma-met-forecast/src
+#export APPDIR=/application/src/sma-met-forecast/src
+export APPDIR=/instance/sma-met-forecast/src
 
 #
 # Working directory, containing temporary data files and
 # ephemeris data used by the plotting script.
 #
-RUNDIR=/application/src/sma-met-forecast/run
+#RUNDIR=/application/src/sma-met-forecast/run
+RUNDIR=/instance/sma-met-forecast/run
 
 #
 # Destination directory for the site forecast data tables.
