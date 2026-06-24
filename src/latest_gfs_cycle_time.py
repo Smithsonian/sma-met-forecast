@@ -15,7 +15,7 @@ import sys
 gfs_lag = float(os.getenv('GFS_PRODUCTION_LAG', '6.0'))
 
 dt_gfs_lag = datetime.timedelta(hours=gfs_lag)
-dt_gfs     = datetime.datetime.utcnow() - dt_gfs_lag
+dt_gfs     = datetime.datetime.now(datetime.utc) - dt_gfs_lag
 
 print('{:04d}{:02d}{:02d} {:02d}'.format(
     dt_gfs.year, dt_gfs.month, dt_gfs.day, int(dt_gfs.hour / 6) * 6), end='')
