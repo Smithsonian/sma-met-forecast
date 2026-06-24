@@ -1,3 +1,9 @@
+# This is a modified version of sma-met-forecast_job.sh that does
+# data download only, useful for recovering data following outages
+# lasting more than 48 hours.  No links are created, and no plots are
+# generated.  The lookback time is set by editing GFS_PRODUCTION_LAG
+# below.
+# 
 #
 # The shell environment in which the forecast scripts run needs
 # to be set up for conda.  CONDA_INIT_SCRIPT_PATH is the location
@@ -30,7 +36,6 @@ TZ="HST"
 #
 # Location and version of am binary, and am environment variables
 #
-#export AM=/application/src/sma-met-forecast/bin/am
 export AM=/instance/sma-met-forecast/bin/am
 export AM_VERSION=$($AM -v | awk '/am version/ {print $3}')
 export OMP_NUM_THREADS=2
@@ -39,14 +44,12 @@ export AM_CACHE_PATH=
 #
 # Directory where these scripts are located
 #
-#export APPDIR=/application/src/sma-met-forecast/src
 export APPDIR=/instance/sma-met-forecast/src
 
 #
 # Working directory, containing temporary data files and
 # ephemeris data used by the plotting script.
 #
-#RUNDIR=/application/src/sma-met-forecast/run
 RUNDIR=/instance/sma-met-forecast/run
 
 #
@@ -73,12 +76,13 @@ SITE_FCAST_PLOT_DIR=/sma/web/sma-met-forecast
 # the lag specified here.)
 #
 # Following the implementation of the FV3-based GFS v.15.1.1 in
-# June 2019, the 384-hour forecast is typically ready about 5.1
+# June 2019, the 384-hour forecast is typrically ready about 5.1
 # hours after the analysis time.
 #
 # See https://www.nco.ncep.noaa.gov/pmb/nwprod/prodstat
 #
-export GFS_PRODUCTION_LAG=5.2
+# export GFS_PRODUCTION_LAG=5.2
+export GFS_PRODUCTION_LAG=48
 
 #
 # Initialize conda and activate the environment for this script.
@@ -143,25 +147,25 @@ for HOURS_AGO in 00 06 12 18 24 30 36 42 48; do
     # access recent forecasts.  If $OUTFILE somehow hasn't been
     # successfully created, leave the link as is.
     #
-    if [ $HOURS_AGO -eq 0 ]; then
-        LINK=$SITE_FCAST_DIR/latest
-    else
-        LINK=$SITE_FCAST_DIR/latest-$HOURS_AGO
-    fi
-    if [ -f $OUTFILE ]; then
-        ln -f -s $OUTFILE $LINK
-	chown -h nobody:nobody $LINK
-    fi
+#     if [ $HOURS_AGO -eq 0 ]; then
+#         LINK=$SITE_FCAST_DIR/latest
+#     else
+#         LINK=$SITE_FCAST_DIR/latest-$HOURS_AGO
+#     fi
+#     if [ -f $OUTFILE ]; then
+#         ln -f -s $OUTFILE $LINK
+# 	chown -h nobody:nobody $LINK
+#     fi
 done
 
 #
 # Generate the plots and move the plot images to the data
 # directory.
 #
-plot_forecast.py "$SITE" $LAT $LON $ALT "$TZ" $AM_VERSION $SITE_FCAST_DIR 120
-plot_forecast.py "$SITE" $LAT $LON $ALT "$TZ" $AM_VERSION $SITE_FCAST_DIR 384
-chown nobody:nobody forecast*.png
-chmod 444 forecast*.png
-mv forecast*.png $SITE_FCAST_PLOT_DIR
+# plot_forecast.py "$SITE" $LAT $LON $ALT "$TZ" $AM_VERSION $SITE_FCAST_DIR 120
+# plot_forecast.py "$SITE" $LAT $LON $ALT "$TZ" $AM_VERSION $SITE_FCAST_DIR 384
+# chown nobody:nobody forecast*.png
+# chmod 444 forecast*.png
+# mv forecast*.png $SITE_FCAST_PLOT_DIR
 
 conda deactivate

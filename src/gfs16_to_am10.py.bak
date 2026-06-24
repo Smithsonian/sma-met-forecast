@@ -8,14 +8,10 @@
 #
 # This version is for GFSv.16 grib2 data, and writes layer data for am-10.0+
 #
-# 2026 June 24 - Modified to lookup grib messages by "shortName" instead
-#                of "name".  Between versions of pygrib, the "name" for
-#                geopotential height changed from "Geopotential Height"
-#                to "Geopotential height", breaking this script.  The
-#                corresponding "name", which is "gh", should be more
-#                stable, as "name" is intended for machine use, whereas
-#                "shortName" is intended as a human-friendly display name.
-#
+# 2026 June 23 - Fixed case sensitivity bug exposed by newer pygrib
+#                module, per Simon Radford.  The "Geopotential height"
+#                Grib file variable was being incorrectly addressed as
+#                "Geopotential Height".  
 
 import argparse
 import datetime
@@ -245,7 +241,7 @@ while retry > 0:
 f = open("temp.grb", 'wb')
 f.write(r.content)
 f.flush()
-grbindx = pygrib.index("temp.grb", "shortName", "level")
+grbindx = pygrib.index("temp.grb", "name", "level")
 
 #
 # Turn the grib2 data into am layers.  In a first pass, interpolate
@@ -265,45 +261,39 @@ cloud_imr = []
 for i,lev in enumerate(LEVELS):
     Pbase.append(lev)
     try:
-        # gh, Geopotential height
         x = (grid_interp(grbindx.select(
-            shortName="gh", level=lev)[0].values, u, v))
+            name="Geopotential Height", level=lev)[0].values, u, v))
         z.append(x)
     except:
         z.append(BADVAL)
     try:
-        # t, Temperature
         x = (grid_interp(grbindx.select(
-            shortName="t", level=lev)[0].values, u, v))
+            name="Temperature", level=lev)[0].values, u, v))
         T.append(x)
     except:
         T.append(BADVAL)
     try:
-        # o3mr, Ozone mixing ratio
         x = (grid_interp(grbindx.select(
-            shortName="o3mr", level=lev)[0].values, u, v))
+            name="Ozone mixing ratio", level=lev)[0].values, u, v))
         x *= M_AIR / M_O3 # convert mass mixing ratio to volume mixing ratio
         o3_vmr.append(x)
     except:
         o3_vmr.append(0.0)
     try:
-        # r, Relative humidity
         x = (grid_interp(grbindx.select(
-            shortName="r", level=lev)[0].values, u, v))
+            name="Relative humidity", level=lev)[0].values, u, v))
         RH.append(x)
     except:
         RH.append(0.0)
     try:
-        # clwmr, Cloud mixing ratio
         x = (grid_interp(grbindx.select(
-            shortName="clwmr", level=lev)[0].values, u, v))
+            name="Cloud mixing ratio", level=lev)[0].values, u, v))
         cloud_lmr.append(x)
     except:
         cloud_lmr.append(0.0)
     try:
-        # icmr, Ice water mixing ratio
         x = (grid_interp(grbindx.select(
-            shortName="icmr", level=lev)[0].values, u, v))
+            name="Ice water mixing ratio", level=lev)[0].values, u, v))
         cloud_imr.append(x)
     except:
         cloud_imr.append(0.0)
